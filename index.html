@@ -1,133 +1,832 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>Test Food Blog</title>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Karma">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CALC × GAME</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600&display=swap" rel="stylesheet">
 <style>
-body,h1,h2,h3,h4,h5,h6 {font-family: "Karma", sans-serif}
-.w3-bar-block .w3-bar-item {padding:20px}
+  :root {
+    --bg: #0a0a0f;
+    --surface: #111118;
+    --panel: #16161f;
+    --border: #2a2a3a;
+    --accent: #00f5c4;
+    --accent2: #ff3d6e;
+    --accent3: #7c4dff;
+    --text: #e8e8f0;
+    --muted: #5a5a72;
+    --glow: 0 0 20px rgba(0,245,196,0.3);
+    --glow2: 0 0 20px rgba(255,61,110,0.3);
+    --radius: 16px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Rajdhani', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 24px 16px 48px;
+    background-image:
+      radial-gradient(ellipse at 20% 0%, rgba(124,77,255,0.08) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 100%, rgba(0,245,196,0.06) 0%, transparent 60%);
+  }
+
+  /* HEADER */
+  header {
+    width: 100%;
+    max-width: 900px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 32px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .logo {
+    font-family: 'Orbitron', monospace;
+    font-weight: 900;
+    font-size: clamp(1.1rem, 3vw, 1.5rem);
+    letter-spacing: 0.15em;
+    color: var(--accent);
+    text-shadow: 0 0 30px rgba(0,245,196,0.6);
+  }
+
+  .logo span { color: var(--accent2); }
+
+  .header-tag {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--muted);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    border: 1px solid var(--border);
+    padding: 4px 10px;
+    border-radius: 4px;
+  }
+
+  /* MAIN GRID */
+  .app-grid {
+    width: 100%;
+    max-width: 900px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+
+  @media (max-width: 680px) {
+    .app-grid { grid-template-columns: 1fr; }
+  }
+
+  /* PANELS */
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    position: relative;
+  }
+
+  .panel::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent3), var(--accent), var(--accent2));
+    opacity: 0.8;
+  }
+
+  .panel-header {
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(255,255,255,0.02);
+  }
+
+  .panel-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 8px var(--accent);
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  .dot.red { background: var(--accent2); box-shadow: 0 0 8px var(--accent2); animation-delay: 0.5s; }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  /* =====================
+     CALCULATOR
+  ===================== */
+  .calc-body { padding: 16px; }
+
+  .calc-display {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin-bottom: 14px;
+    text-align: right;
+    min-height: 80px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .calc-display::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(0,245,196,0.03) 0%, transparent 100%);
+  }
+
+  .calc-expr {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--muted);
+    min-height: 16px;
+    word-break: break-all;
+    letter-spacing: 0.05em;
+  }
+
+  .calc-result {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(1.4rem, 4vw, 1.9rem);
+    font-weight: 700;
+    color: var(--accent);
+    text-shadow: var(--glow);
+    word-break: break-all;
+    letter-spacing: 0.05em;
+    transition: transform 0.1s ease;
+  }
+
+  .calc-result.pop { transform: scale(1.04); }
+
+  .calc-keys {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+  }
+
+  .key {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: clamp(0.85rem, 2.5vw, 1rem);
+    font-weight: 600;
+    border: none;
+    border-radius: 10px;
+    padding: 14px 8px;
+    cursor: pointer;
+    transition: all 0.12s ease;
+    position: relative;
+    overflow: hidden;
+    letter-spacing: 0.05em;
+    outline: none;
+  }
+
+  .key::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: white;
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+
+  .key:active::after { opacity: 0.08; }
+  .key:active { transform: scale(0.94); }
+
+  .key-num {
+    background: var(--surface);
+    color: var(--text);
+    border: 1px solid var(--border);
+  }
+
+  .key-num:hover {
+    background: #1e1e2a;
+    border-color: var(--accent3);
+    color: var(--accent);
+  }
+
+  .key-op {
+    background: rgba(124,77,255,0.15);
+    color: var(--accent3);
+    border: 1px solid rgba(124,77,255,0.3);
+  }
+
+  .key-op:hover {
+    background: rgba(124,77,255,0.3);
+    box-shadow: 0 0 16px rgba(124,77,255,0.3);
+  }
+
+  .key-eq {
+    background: linear-gradient(135deg, var(--accent), #00c896);
+    color: #001a12;
+    font-weight: 700;
+    border: none;
+    box-shadow: 0 4px 20px rgba(0,245,196,0.25);
+  }
+
+  .key-eq:hover {
+    box-shadow: 0 4px 28px rgba(0,245,196,0.45);
+    transform: translateY(-1px);
+  }
+
+  .key-clear {
+    background: rgba(255,61,110,0.15);
+    color: var(--accent2);
+    border: 1px solid rgba(255,61,110,0.3);
+  }
+
+  .key-clear:hover {
+    background: rgba(255,61,110,0.3);
+    box-shadow: 0 0 16px rgba(255,61,110,0.3);
+  }
+
+  .key-func {
+    background: rgba(0,245,196,0.07);
+    color: var(--accent);
+    border: 1px solid rgba(0,245,196,0.2);
+    font-size: 0.8rem;
+  }
+
+  .key-func:hover {
+    background: rgba(0,245,196,0.15);
+  }
+
+  .span2 { grid-column: span 2; }
+
+  /* =====================
+     TIC TAC TOE
+  ===================== */
+  .game-body { padding: 16px; }
+
+  .game-status {
+    text-align: center;
+    margin-bottom: 14px;
+    min-height: 28px;
+  }
+
+  .status-text {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.8rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    transition: all 0.3s ease;
+  }
+
+  .status-text.win {
+    color: var(--accent);
+    text-shadow: var(--glow);
+    animation: statusPulse 0.6s ease;
+  }
+
+  .status-text.draw { color: var(--accent3); }
+  .status-text.x-turn { color: var(--accent2); }
+
+  @keyframes statusPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.06); }
+    100% { transform: scale(1); }
+  }
+
+  /* Score bar */
+  .score-bar {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+
+  .score-card {
+    flex: 1;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 8px;
+    text-align: center;
+  }
+
+  .score-card.active-x { border-color: rgba(255,61,110,0.5); background: rgba(255,61,110,0.06); }
+  .score-card.active-o { border-color: rgba(0,245,196,0.5); background: rgba(0,245,196,0.06); }
+
+  .score-label {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.55rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    color: var(--muted);
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  .score-val {
+    font-family: 'Orbitron', monospace;
+    font-size: 1.1rem;
+    font-weight: 900;
+  }
+
+  .score-val.x { color: var(--accent2); }
+  .score-val.o { color: var(--accent); }
+  .score-val.d { color: var(--accent3); }
+
+  /* Board */
+  .ttt-board {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+
+  .cell {
+    aspect-ratio: 1;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(1.4rem, 5vw, 2rem);
+    font-weight: 900;
+    transition: all 0.15s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cell:hover:not(.taken) {
+    background: #1e1e2a;
+    border-color: var(--accent3);
+    transform: scale(1.03);
+  }
+
+  .cell.x-cell {
+    color: var(--accent2);
+    text-shadow: var(--glow2);
+    border-color: rgba(255,61,110,0.4);
+    background: rgba(255,61,110,0.06);
+    animation: cellPop 0.2s ease;
+  }
+
+  .cell.o-cell {
+    color: var(--accent);
+    text-shadow: var(--glow);
+    border-color: rgba(0,245,196,0.4);
+    background: rgba(0,245,196,0.06);
+    animation: cellPop 0.2s ease;
+  }
+
+  .cell.win-cell {
+    animation: winGlow 1s ease infinite alternate;
+  }
+
+  .cell.x-cell.win-cell { background: rgba(255,61,110,0.18); }
+  .cell.o-cell.win-cell { background: rgba(0,245,196,0.18); }
+
+  @keyframes cellPop {
+    0% { transform: scale(0.85); }
+    60% { transform: scale(1.08); }
+    100% { transform: scale(1); }
+  }
+
+  @keyframes winGlow {
+    from { box-shadow: none; }
+    to { box-shadow: 0 0 20px rgba(0,245,196,0.4); }
+  }
+
+  .cell.taken { cursor: default; }
+
+  /* Mode selector */
+  .mode-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+
+  .mode-btn {
+    flex: 1;
+    padding: 8px 6px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .mode-btn.active {
+    background: rgba(124,77,255,0.2);
+    border-color: var(--accent3);
+    color: var(--accent3);
+    box-shadow: 0 0 12px rgba(124,77,255,0.2);
+  }
+
+  /* Reset */
+  .reset-btn {
+    width: 100%;
+    padding: 11px;
+    font-family: 'Orbitron', monospace;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    border-radius: 10px;
+    border: 1px solid rgba(255,61,110,0.3);
+    background: rgba(255,61,110,0.08);
+    color: var(--accent2);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .reset-btn:hover {
+    background: rgba(255,61,110,0.18);
+    box-shadow: 0 0 16px rgba(255,61,110,0.25);
+  }
+
+  /* FOOTER */
+  footer {
+    margin-top: 36px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--muted);
+    letter-spacing: 0.2em;
+    text-align: center;
+    opacity: 0.6;
+  }
+
+  /* Scanline overlay */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.03) 2px,
+      rgba(0,0,0,0.03) 4px
+    );
+    z-index: 9999;
+  }
 </style>
 </head>
 <body>
 
-<!-- Sidebar (hidden by default) -->
-<nav class="w3-sidebar w3-bar-block w3-card w3-top w3-xlarge w3-animate-left" style="display:none;z-index:2;width:40%;min-width:300px" id="mySidebar">
-  <a href="javascript:void(0)" onclick="w3_close()"
-  class="w3-bar-item w3-button">Close Menu</a>
-  <a href="#food" onclick="w3_close()" class="w3-bar-item w3-button">Food</a>
-  <a href="#about" onclick="w3_close()" class="w3-bar-item w3-button">About</a>
-</nav>
+<header>
+  <div class="logo">CALC<span> × </span>GAME</div>
+  <div class="header-tag">v2.0 // DUAL MODE</div>
+</header>
 
-<!-- Top menu -->
-<div class="w3-top">
-  <div class="w3-white w3-xlarge" style="max-width:1200px;margin:auto">
-    <div class="w3-button w3-padding-16 w3-left" onclick="w3_open()">☰</div>
-    <div class="w3-right w3-padding-16">Mail</div>
-    <div class="w3-center w3-padding-16">My Food</div>
+<div class="app-grid">
+
+  <!-- ======= CALCULATOR ======= -->
+  <div class="panel">
+    <div class="panel-header">
+      <div class="dot"></div>
+      <span class="panel-title">Calculator</span>
+    </div>
+    <div class="calc-body">
+      <div class="calc-display">
+        <div class="calc-expr" id="expr"></div>
+        <div class="calc-result" id="result">0</div>
+      </div>
+      <div class="calc-keys">
+        <!-- Row 1 -->
+        <button class="key key-clear" onclick="calcClear()">AC</button>
+        <button class="key key-func" onclick="calcToggleSign()">+/−</button>
+        <button class="key key-func" onclick="calcPercent()">%</button>
+        <button class="key key-op" onclick="calcOp('÷')">÷</button>
+        <!-- Row 2 -->
+        <button class="key key-num" onclick="calcNum('7')">7</button>
+        <button class="key key-num" onclick="calcNum('8')">8</button>
+        <button class="key key-num" onclick="calcNum('9')">9</button>
+        <button class="key key-op" onclick="calcOp('×')">×</button>
+        <!-- Row 3 -->
+        <button class="key key-num" onclick="calcNum('4')">4</button>
+        <button class="key key-num" onclick="calcNum('5')">5</button>
+        <button class="key key-num" onclick="calcNum('6')">6</button>
+        <button class="key key-op" onclick="calcOp('−')">−</button>
+        <!-- Row 4 -->
+        <button class="key key-num" onclick="calcNum('1')">1</button>
+        <button class="key key-num" onclick="calcNum('2')">2</button>
+        <button class="key key-num" onclick="calcNum('3')">3</button>
+        <button class="key key-op" onclick="calcOp('+')">+</button>
+        <!-- Row 5 -->
+        <button class="key key-num span2" onclick="calcNum('0')">0</button>
+        <button class="key key-num" onclick="calcDot()">.</button>
+        <button class="key key-eq" onclick="calcEquals()">=</button>
+      </div>
+    </div>
   </div>
+
+  <!-- ======= TIC-TAC-TOE ======= -->
+  <div class="panel">
+    <div class="panel-header">
+      <div class="dot red"></div>
+      <span class="panel-title">Tic-Tac-Toe</span>
+    </div>
+    <div class="game-body">
+
+      <div class="mode-row">
+        <button class="mode-btn active" id="btn-pvp" onclick="setMode('pvp')">2 Players</button>
+        <button class="mode-btn" id="btn-ai" onclick="setMode('ai')">vs CPU</button>
+      </div>
+
+      <div class="score-bar">
+        <div class="score-card" id="card-x">
+          <span class="score-label">X — Player</span>
+          <span class="score-val x" id="score-x">0</span>
+        </div>
+        <div class="score-card">
+          <span class="score-label">Draws</span>
+          <span class="score-val d" id="score-d">0</span>
+        </div>
+        <div class="score-card" id="card-o">
+          <span class="score-label" id="o-label">O — Player</span>
+          <span class="score-val o" id="score-o">0</span>
+        </div>
+      </div>
+
+      <div class="game-status">
+        <div class="status-text x-turn" id="status">X's Turn</div>
+      </div>
+
+      <div class="ttt-board" id="board">
+        <div class="cell" onclick="cellClick(0)" id="c0"></div>
+        <div class="cell" onclick="cellClick(1)" id="c1"></div>
+        <div class="cell" onclick="cellClick(2)" id="c2"></div>
+        <div class="cell" onclick="cellClick(3)" id="c3"></div>
+        <div class="cell" onclick="cellClick(4)" id="c4"></div>
+        <div class="cell" onclick="cellClick(5)" id="c5"></div>
+        <div class="cell" onclick="cellClick(6)" id="c6"></div>
+        <div class="cell" onclick="cellClick(7)" id="c7"></div>
+        <div class="cell" onclick="cellClick(8)" id="c8"></div>
+      </div>
+
+      <button class="reset-btn" onclick="resetGame()">↺ NEW GAME</button>
+    </div>
+  </div>
+
 </div>
-  
-<!-- !PAGE CONTENT! -->
-<div class="w3-main w3-content w3-padding" style="max-width:1200px;margin-top:100px">
 
-  <!-- First Photo Grid-->
-  <div class="w3-row-padding w3-padding-16 w3-center" id="food">
-    <div class="w3-quarter">
-      <img src="https://vaya.in/recipes/wp-content/uploads/2018/06/Club-sandwich.jpg" alt="Sandwich" style="width:100%">
-      <h3>The Perfect Sandwich, A Real NYC Classic</h3>
-    </div>
-    <div class="w3-quarter">
-      <img src="https://arc-anglerfish-washpost-prod-washpost.s3.amazonaws.com/public/53BGPNAB6YI63C7LFNHEQGYVAA.jpg" alt="Steak" style="width:100%">
-      <h3>Let Me Tell You About This Steak</h3>
-    </div>
-    <div class="w3-quarter">
-      <img src="https://blog.lexmed.com/images/librariesprovider80/blog-post-featured-images/shutterstock_1933299218.jpg?sfvrsn=4a8d900b_0" alt="Cherries" style="width:100%">
-      <h3>Cherries, interrupted</h3>
-      <p>What else?</p>
-    </div>
-    <div class="w3-quarter">
-      <img src="https://www.acouplecooks.com/wp-content/uploads/2023/01/Red-Sauce-Pasta-008.jpg" alt="Pasta and Wine" style="width:100%">
-      <h3>Once Again, Robust Wine and Vegetable Pasta</h3>
-    </div>
-  </div>
-  
-  <!-- Second Photo Grid-->
-  <div class="w3-row-padding w3-padding-16 w3-center">
-    <div class="w3-quarter">
-      <img src="https://feelgoodfoodie.net/wp-content/uploads/2022/04/How-to-Make-Popsicles-15.jpg" alt="Popsicle" style="width:100%">
-      <h3>All I Need Is a Popsicle</h3>
-    </div>
-    <div class="w3-quarter">
-      <img src="https://www.wholesomeyum.com/wp-content/uploads/2021/07/wholesomeyum-Pan-Seared-Salmon-12.jpg" alt="Salmon" style="width:100%">
-      <h3>Salmon For Your Skin</h3>
-    </div>
-    <div class="w3-quarter">
-      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/ab/Desserts.jpg/640px-Desserts.jpg" alt="Sandwich" style="width:100%">
-      <h3>The Perfect Dessert</h3>
-    </div>
-    <div class="w3-quarter">
-      <img src="https://www.simplejoy.com/wp-content/uploads/2021/04/Croissant-French-Toast-5.jpg" alt="Croissant" style="width:100%">
-      <h3>Le French</h3>
-    </div>
-  </div>
-
-  <!-- Pagination -->
-  <div class="w3-center w3-padding-32">
-    <div class="w3-bar">
-      <a href="#" class="w3-bar-item w3-button w3-hover-black">«</a>
-      <a href="#" class="w3-bar-item w3-black w3-button">1</a>
-      <a href="#" class="w3-bar-item w3-button w3-hover-black">2</a>
-      <a href="#" class="w3-bar-item w3-button w3-hover-black">3</a>
-      <a href="#" class="w3-bar-item w3-button w3-hover-black">4</a>
-      <a href="#" class="w3-bar-item w3-button w3-hover-black">»</a>
-    </div>
-  </div>
-  
-  <hr id="about">
-
-  <!-- About Section -->
-  <div class="w3-container w3-padding-32 w3-center">  
-    <h3>About Me, The Food Man</h3><br>
-    <img src="https://www.cordonbleu.edu/Files/MediaFile/58300.jpg" alt="Me" class="w3-image" style="display:block;margin:auto" width="800" height="533">
-    <div class="w3-padding-32">
-      <h4><b>I am Who I Am!</b></h4>
-      <h6><i>With Passion For Real, Good Food</i></h6>
-      <p>Just me, myself and I, exploring the universe of unknownment. I have a heart of love and an interest on food blog. I want to share my world with you.</p>
-    </div>
-  </div>
-  <hr>
-  
-  <!-- Footer -->
-  <footer class="w3-row-padding w3-padding-32">
-
-    <div class="w3-third w3-serif">
-      <h3>POPULAR TAGS</h3>
-      <p>
-        <span class="w3-tag w3-black w3-margin-bottom">Travel</span> <span class="w3-tag w3-dark-grey w3-small w3-margin-bottom">New York</span> <span class="w3-tag w3-dark-grey w3-small w3-margin-bottom">Dinner</span>
-        <span class="w3-tag w3-dark-grey w3-small w3-margin-bottom">Salmon</span> <span class="w3-tag w3-dark-grey w3-small w3-margin-bottom">France</span> <span class="w3-tag w3-dark-grey w3-small w3-margin-bottom">Drinks</span>
-        <span class="w3-tag w3-dark-grey w3-small w3-margin-bottom">Ideas</span> <span class="w3-tag w3-dark-grey w3-small w3-margin-bottom">Flavors</span> <span class="w3-tag w3-dark-grey w3-small w3-margin-bottom">Cuisine</span>
-        <span class="w3-tag w3-dark-grey w3-small w3-margin-bottom">Chicken</span> <span class="w3-tag w3-dark-grey w3-small w3-margin-bottom">Dressing</span> <span class="w3-tag w3-dark-grey w3-small w3-margin-bottom">Fried</span>
-        <span class="w3-tag w3-dark-grey w3-small w3-margin-bottom">Fish</span> <span class="w3-tag w3-dark-grey w3-small w3-margin-bottom">Duck</span>
-      </p>
-    </div>
-  </footer>
-
-<!-- End page content -->
-</div>
+<footer>CALC × GAME // BUILT WITH ♥ // ALL RIGHTS RESERVED</footer>
 
 <script>
-// Script to open and close sidebar
-function w3_open() {
-  document.getElementById("mySidebar").style.display = "block";
+/* ==============================
+   CALCULATOR LOGIC
+============================== */
+let calcState = {
+  current: '0',
+  prev: '',
+  operator: null,
+  shouldReset: false,
+  expr: ''
+};
+
+function updateDisplay() {
+  const r = document.getElementById('result');
+  const e = document.getElementById('expr');
+  r.textContent = calcState.current;
+  e.textContent = calcState.expr;
+  r.classList.add('pop');
+  setTimeout(() => r.classList.remove('pop'), 100);
 }
- 
-function w3_close() {
-  document.getElementById("mySidebar").style.display = "none";
+
+function calcNum(n) {
+  if (calcState.shouldReset) {
+    calcState.current = n;
+    calcState.shouldReset = false;
+  } else {
+    if (calcState.current === '0' && n !== '.') {
+      calcState.current = n;
+    } else {
+      if (calcState.current.length < 12) calcState.current += n;
+    }
+  }
+  updateDisplay();
+}
+
+function calcDot() {
+  if (calcState.shouldReset) { calcState.current = '0.'; calcState.shouldReset = false; updateDisplay(); return; }
+  if (!calcState.current.includes('.')) { calcState.current += '.'; updateDisplay(); }
+}
+
+function calcOp(op) {
+  if (calcState.operator && !calcState.shouldReset) calcEquals(true);
+  calcState.prev = calcState.current;
+  calcState.operator = op;
+  calcState.expr = calcState.current + ' ' + op;
+  calcState.shouldReset = true;
+  updateDisplay();
+}
+
+function calcEquals(chain = false) {
+  if (!calcState.operator) return;
+  const a = parseFloat(calcState.prev);
+  const b = parseFloat(calcState.current);
+  let res;
+  switch (calcState.operator) {
+    case '+': res = a + b; break;
+    case '−': res = a - b; break;
+    case '×': res = a * b; break;
+    case '÷': res = b === 0 ? 'Error' : a / b; break;
+    default: return;
+  }
+  if (!chain) calcState.expr = calcState.prev + ' ' + calcState.operator + ' ' + calcState.current + ' =';
+  let resStr = (res === 'Error') ? 'Error' : parseFloat(res.toFixed(10)).toString();
+  if (resStr.length > 12) resStr = parseFloat(res.toPrecision(8)).toString();
+  calcState.current = resStr;
+  calcState.operator = null;
+  calcState.shouldReset = true;
+  updateDisplay();
+}
+
+function calcClear() {
+  calcState = { current: '0', prev: '', operator: null, shouldReset: false, expr: '' };
+  updateDisplay();
+}
+
+function calcToggleSign() {
+  if (calcState.current !== '0' && calcState.current !== 'Error') {
+    calcState.current = calcState.current.startsWith('-') ? calcState.current.slice(1) : '-' + calcState.current;
+    updateDisplay();
+  }
+}
+
+function calcPercent() {
+  if (calcState.current !== 'Error') {
+    calcState.current = (parseFloat(calcState.current) / 100).toString();
+    updateDisplay();
+  }
+}
+
+// Keyboard support
+document.addEventListener('keydown', e => {
+  if ('0123456789'.includes(e.key)) calcNum(e.key);
+  else if (e.key === '.') calcDot();
+  else if (e.key === '+') calcOp('+');
+  else if (e.key === '-') calcOp('−');
+  else if (e.key === '*') calcOp('×');
+  else if (e.key === '/') { e.preventDefault(); calcOp('÷'); }
+  else if (e.key === 'Enter' || e.key === '=') calcEquals();
+  else if (e.key === 'Backspace') {
+    if (calcState.current.length > 1) calcState.current = calcState.current.slice(0, -1);
+    else calcState.current = '0';
+    updateDisplay();
+  }
+  else if (e.key === 'Escape') calcClear();
+});
+
+/* ==============================
+   TIC-TAC-TOE LOGIC
+============================== */
+const WINS = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+let board = Array(9).fill('');
+let currentPlayer = 'X';
+let gameOver = false;
+let mode = 'pvp'; // 'pvp' or 'ai'
+let scores = { X: 0, O: 0, D: 0 };
+
+function setMode(m) {
+  mode = m;
+  document.getElementById('btn-pvp').classList.toggle('active', m === 'pvp');
+  document.getElementById('btn-ai').classList.toggle('active', m === 'ai');
+  document.getElementById('o-label').textContent = m === 'ai' ? 'O — CPU' : 'O — Player';
+  resetGame();
+}
+
+function cellClick(i) {
+  if (gameOver || board[i]) return;
+  if (mode === 'ai' && currentPlayer === 'O') return;
+  makeMove(i, currentPlayer);
+  if (!gameOver && mode === 'ai' && currentPlayer === 'O') {
+    setTimeout(aiMove, 350);
+  }
+}
+
+function makeMove(i, player) {
+  board[i] = player;
+  const cell = document.getElementById('c' + i);
+  cell.textContent = player;
+  cell.classList.add('taken', player === 'X' ? 'x-cell' : 'o-cell');
+
+  const win = checkWin(player);
+  if (win) {
+    win.forEach(idx => document.getElementById('c' + idx).classList.add('win-cell'));
+    scores[player]++;
+    updateScores();
+    setStatus((player === 'X' ? '✕ X' : '○ O') + ' WINS!', 'win');
+    gameOver = true;
+    return;
+  }
+  if (board.every(v => v)) {
+    scores.D++;
+    updateScores();
+    setStatus('DRAW — WELL PLAYED', 'draw');
+    gameOver = true;
+    return;
+  }
+  currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+  setStatus(currentPlayer + "'s Turn", currentPlayer === 'X' ? 'x-turn' : '');
+  updateActiveCards();
+}
+
+function checkWin(p) {
+  for (const combo of WINS) {
+    if (combo.every(i => board[i] === p)) return combo;
+  }
+  return null;
+}
+
+function setStatus(msg, cls) {
+  const el = document.getElementById('status');
+  el.textContent = msg;
+  el.className = 'status-text ' + (cls || '');
+}
+
+function updateActiveCards() {
+  document.getElementById('card-x').className = 'score-card' + (currentPlayer === 'X' ? ' active-x' : '');
+  document.getElementById('card-o').className = 'score-card' + (currentPlayer === 'O' ? ' active-o' : '');
+}
+
+function updateScores() {
+  document.getElementById('score-x').textContent = scores.X;
+  document.getElementById('score-o').textContent = scores.O;
+  document.getElementById('score-d').textContent = scores.D;
+}
+
+function resetGame() {
+  board = Array(9).fill('');
+  currentPlayer = 'X';
+  gameOver = false;
+  for (let i = 0; i < 9; i++) {
+    const c = document.getElementById('c' + i);
+    c.textContent = '';
+    c.className = 'cell';
+  }
+  setStatus("X's Turn", 'x-turn');
+  updateActiveCards();
+}
+
+/* AI — Minimax */
+function aiMove() {
+  if (gameOver) return;
+  const best = minimax(board, 'O');
+  makeMove(best.index, 'O');
+}
+
+function minimax(b, player) {
+  const avail = b.map((v, i) => v === '' ? i : null).filter(v => v !== null);
+  if (checkWinBoard(b, 'X')) return { score: -10 };
+  if (checkWinBoard(b, 'O')) return { score: 10 };
+  if (avail.length === 0) return { score: 0 };
+
+  const moves = [];
+  for (const idx of avail) {
+    const nb = [...b];
+    nb[idx] = player;
+    const result = minimax(nb, player === 'O' ? 'X' : 'O');
+    moves.push({ index: idx, score: result.score });
+  }
+  if (player === 'O') {
+    const best = moves.reduce((a, b) => b.score > a.score ? b : a);
+    return best;
+  } else {
+    const best = moves.reduce((a, b) => b.score < a.score ? b : a);
+    return best;
+  }
+}
+
+function checkWinBoard(b, p) {
+  return WINS.some(c => c.every(i => b[i] === p));
 }
 </script>
-
 </body>
 </html>
